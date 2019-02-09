@@ -10,20 +10,20 @@ source("./R/comparison_functions.R")
 
 cvAUCcompare <- function(predictions1, predictions2,
                          labels, label.ordering, folds=NULL,
-                         confidence = 0.95, method = "diff"){
+                         confidence = 0.95, comparison = "diff"){
   # Obtain cvAUC Estimates and Influence Curves
   cvAUC1 = cvAUC_ic(predictions1, labels, label.ordering, folds, confidence)
   cvAUC2 = cvAUC_ic(predictions2, labels, label.ordering, folds, confidence)
 
   # Get One of 3 Measures of Interest
-  if(method == "diff"){
+  if(comparison == "diff"){
     res = difference(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
-  } else if (method == "ratio"){
+  } else if (comparison == "ratio"){
     res = ratio(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
-  } else if (method == "log_ratio"){
+  } else if (comparison == "log_ratio"){
     res = logratio(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
     #Note should push CIs back onto original scale too
-  }
+  } else {stop("Invalid comparison specified; must be one of diff, ratio, log_ratio") }
 
   z = -qnorm((1- confidence)/2)
   h = res[[1]]
