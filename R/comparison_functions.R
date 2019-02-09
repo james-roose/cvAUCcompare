@@ -14,7 +14,7 @@ delta_method <- function(grad, Sigma){
 
 # Difference
 # Function to Compute the Difference in AUC and the variance of the difference
-cvAUC_difference <- function(auc1, auc2, ic1, ic2){
+difference <- function(auc1, auc2, ic1, ic2){
   n_obs = length(ic1)
   h = auc1 - auc2
   #Gradient of h(auc1, auc2) and Covariance Matrix of ICs
@@ -27,7 +27,7 @@ cvAUC_difference <- function(auc1, auc2, ic1, ic2){
 
 # Ratio
 # Function to Compute the Ratio in AUC and the variance of the difference
-cvAUC_ratio <- function(auc1, auc2, ic1, ic2){
+ratio <- function(auc1, auc2, ic1, ic2){
   n_obs = length(ic1)
   h = auc1/auc2
 
@@ -41,7 +41,7 @@ cvAUC_ratio <- function(auc1, auc2, ic1, ic2){
 
 # Log-Ratio
 # Function to Compute the log-ratio in AUC and the variance of the log ratio
-cvAUC_logratio <- function(auc1, auc2, ic1, ic2){
+logratio <- function(auc1, auc2, ic1, ic2){
   n_obs = length(ic1)
   h = log(auc1) - log(auc2)
 
