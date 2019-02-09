@@ -49,6 +49,6 @@ logratio <- function(auc1, auc2, ic1, ic2){
   grad = c(1/auc1, -1/auc2)
   Sigma = cov(as.matrix(cbind(ic1, ic2)))
 
-  var_h = (1/nobs)*(1/nobs)*delta_method(grad, Sigma)
+  var_h = (1/nobs)*delta_method(grad, Sigma)
   return(list(h = h, var_h = var_h))
 }
