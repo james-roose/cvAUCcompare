@@ -16,11 +16,11 @@ cvAUCcompare <- function(predictions1, predictions2,
 
   # Get One of 3 Measures of Interest
   if(method == "diff"){
-    res = cvAUC_difference(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
+    res = difference(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
   } else if (method == "ratio"){
-    res = cvAUC_ratio(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
+    res = ratio(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
   } else if (method == "log_ratio"){
-    res = cvAUC_logratio(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
+    res = logratio(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
     #Note should push CIs back onto original scale too
   }
 
