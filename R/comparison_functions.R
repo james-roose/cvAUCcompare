@@ -18,7 +18,7 @@ difference <- function(auc1, auc2, ic1, ic2){
   n_obs = length(ic1)
   h = auc1 - auc2
   #Gradient of h(auc1, auc2) and Covariance Matrix of ICs
-  grad = c(1, 1)
+  grad = c(1, -1)
   Sigma = cov(as.matrix(cbind(ic1, ic2)))
 
   var_h = (1/nobs)*delta_method(grad, Sigma)
@@ -46,7 +46,7 @@ logratio <- function(auc1, auc2, ic1, ic2){
   h = log(auc1) - log(auc2)
 
   #Gradient of h(auc1, auc2) and Covariance Matrix of ICs
-  grad = c(1/auc1, 1/auc2)
+  grad = c(1/auc1, -1/auc2)
   Sigma = cov(as.matrix(cbind(ic1, ic2)))
 
   var_h = (1/nobs)*(1/nobs)*delta_method(grad, Sigma)
