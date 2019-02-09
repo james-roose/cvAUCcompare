@@ -9,6 +9,7 @@
 
 source("./R/cvAUC_ic.R")
 source("./R/internals.R")
+source("./R/comparison_functions.R")
 
 cvAUPRCcompare <- function(predictions1, predictions2,
                            labels, label.ordering, folds=NULL,
