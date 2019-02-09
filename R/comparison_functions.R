@@ -6,7 +6,11 @@
 #
 #
 
-# Functions for First-Order Delta Method Variance
+# Function for First-Order Delta Method Variance
+#
+delta_method <- function(grad, Sigma){
+  t(grad)%*%Sigma%*%grad
+}
 
 # Difference
 # Function to Compute the Difference in AUC and the variance of the difference
@@ -17,7 +21,7 @@ cvAUC_difference <- function(auc1, auc2, ic1, ic2){
   grad = c(1, 1)
   Sigma = cov(as.matrix(cbind(ic1, ic2)))
 
-  diff_var = (1/nobs)*(grad*Sigma*grad)
+  diff_var = (1/nobs)*delta_method(grad, Sigma)
   diff_se = sqrt(diff_var)
   return(list(diff = diff, var = diff_var))
 }
@@ -32,7 +36,7 @@ cvAUC_ratio <- function(auc1, auc2, ic1, ic2){
   grad = c(1/auc2, -auc1/(auc2^2))
   Sigma = cov(as.matrix(cbind(ic1, ic2)))
 
-  ratio_var = (1/nobs)*(grad*Sigma*grad)
+  ratio_var = (1/nobs)*delta_method(grad, Sigma)
   ratio_se = sqrt(ratio_var)
   return(list(ratio = ratio, var = ratio_var))
 }
@@ -47,7 +51,7 @@ cvAUC_logratio <- function(auc1, auc2, ic1, ic2){
   grad = c(1/auc1, 1/auc2)
   Sigma = cov(as.matrix(cbind(ic1, ic2)))
 
-  lr_var = (1/nobs)*(1/nobs)*(grad*Sigma*grad)
+  lr_var = (1/nobs)*(1/nobs)*delta_method(grad, Sigma)
   lr_se = sqrt(lr_var)
   return(list(log_ratio = log_ratio, var = lr_var))
 }
