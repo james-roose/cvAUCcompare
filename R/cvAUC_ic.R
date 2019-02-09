@@ -4,7 +4,8 @@
 # curve from a vector of predictions, a vector of true outcomes and a list or
 # vector of fold labels
 source("./R/internals.R")
-cvAUC_ic <- function(predictions1, labels, label.ordering = NULL, folds = NULL) {
+cvAUC_ic <- function(predictions1, labels, label.ordering = NULL, folds = NULL,
+                     confidence = 0.95) {
 
   # Pre-process the input
   #Prediction Algo 1:
@@ -33,7 +34,7 @@ cvAUC_ic <- function(predictions1, labels, label.ordering = NULL, folds = NULL) 
     n_rows <- length(fold_labels)
     n_pos <- sum(fold_labels == pos)
     n_neg <- n_rows - n_pos
-    auc <- AUC(fold_preds, fold_labels)
+    auc <- cvAUC::AUC(fold_preds, fold_labels)
     DT <- data.table(pred = fold_preds, label = fold_labels)
     DT <- DT[order(pred, -xtfrm(label))]  #Sort by asc(pred), desc(label)
     DT[, fracNegLabelsWithSmallerPreds := cumsum(label == neg)/n_neg]
