@@ -28,6 +28,6 @@ cvAUCcompare <- function(predictions1, predictions2,
   z = -qnorm((1- confidence)/2)
   h = res[[1]]
   se_h = sqrt(res[[2]])
-  return(list(method = method, h = h, var_h = res[[2]],
+  return(list(comparison = comparison, h = h, var_h = res[[2]],
               se_h = se_h, ci_l = h-z*se_h, ci_u = h+z*se_h))
 }
