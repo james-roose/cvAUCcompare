@@ -8,16 +8,18 @@
 source("./R/cvAUC_ic.R")
 source("./R/internals.R")
 
-
 cvAUCcompare <- function(predictions1, predictions2,
-                         labels, label.ordering, folds=NULL){
+                         labels, label.ordering, folds=NULL,
+                         confidence = 0.95, method = "diff"){
   # Obtain cvAUC Estimates and Influence Curves
-  cvAUC1 = cvAUC_ic(predictions1, labels, label.ordering, folds)
-  cvAUC2 = cvAUC_ic(predictions2, labels, label.ordering, folds)
+  cvAUC1 = cvAUC_ic(predictions1, labels, label.ordering, folds, confidence)
+  cvAUC2 = cvAUC_ic(predictions2, labels, label.ordering, folds, confidence)
 
   # Get 3 Measures of Interest
   diff = cvAUC_difference(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
+
   ratio = cvAUC_ratio(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
+
   log_ratio = cvAUC_logratio(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
 
   return(list(diff = diff, ratio = ratio, log_ratio = log_ratio))
