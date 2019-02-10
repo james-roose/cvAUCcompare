@@ -1,9 +1,8 @@
 # Utility Functions
 #
 # This file contains functions to calculate differences, ratios and log-ratios
-# of cross-validated AUC estimates as well as the variance of the comparisons
-# using either a first order or second order delta method.
-#
+# of cross-validated estimates as well as the variance of the comparisons
+# using estimated influence curves
 #
 
 # Function for First-Order Delta Method Variance
@@ -13,11 +12,11 @@ delta_method <- function(grad, Sigma){
 }
 
 # Difference
-# Function to Compute the Difference in AUC and the variance of the difference
-difference <- function(auc1, auc2, ic1, ic2){
+# Function to Compute the Difference and the variance of the difference
+difference <- function(psi1, psi2, ic1, ic2){
   n_obs = length(ic1)
-  h = auc1 - auc2
-  #Gradient of h(auc1, auc2) and Covariance Matrix of ICs
+  h = psi1 - psi2
+  #Gradient of h(psi1, psi2) and Covariance Matrix of ICs
   grad = c(1, -1)
   Sigma = cov(as.matrix(cbind(ic1, ic2)))
 
@@ -26,13 +25,13 @@ difference <- function(auc1, auc2, ic1, ic2){
 }
 
 # Ratio
-# Function to Compute the Ratio in AUC and the variance of the difference
-ratio <- function(auc1, auc2, ic1, ic2){
+# Function to Compute the Ratio in and the variance of the Ratio
+ratio <- function(psi1, psi2, ic1, ic2){
   n_obs = length(ic1)
-  h = auc1/auc2
+  h = psi1/psi2
 
-  #Gradient of h(auc1, auc2) and Covariance Matrix of ICs
-  grad = c(1/auc2, -auc1/(auc2^2))
+  #Gradient of h(psi1, psi2) and Covariance Matrix of ICs
+  grad = c(1/psi2, -psi1/(psi2^2))
   Sigma = cov(as.matrix(cbind(ic1, ic2)))
 
   var_h = (1/nobs)*delta_method(grad, Sigma)
@@ -40,13 +39,13 @@ ratio <- function(auc1, auc2, ic1, ic2){
 }
 
 # Log-Ratio
-# Function to Compute the log-ratio in AUC and the variance of the log ratio
-logratio <- function(auc1, auc2, ic1, ic2){
+# Function to Compute the log-ratio and the variance of the log ratio
+logratio <- function(psi1, psi2, ic1, ic2){
   n_obs = length(ic1)
-  h = log(auc1) - log(auc2)
+  h = log(psi1) - log(psi2)
 
-  #Gradient of h(auc1, auc2) and Covariance Matrix of ICs
-  grad = c(1/auc1, -1/auc2)
+  #Gradient of h(psi1, psi2) and Covariance Matrix of ICs
+  grad = c(1/psi1, -1/psi2)
   Sigma = cov(as.matrix(cbind(ic1, ic2)))
 
   var_h = (1/nobs)*delta_method(grad, Sigma)
