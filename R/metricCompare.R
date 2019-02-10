@@ -57,16 +57,27 @@ calculate_metric <- function(predictions,
   se = NULL
   if (inference  == "binomial"){
     se = get_binomial_se(n, p)
-  } else if (inference == "logit_binomial"){
+    ci = c(p - z*se, p + z*se)
+  } else if (inference == "logit"){
     se = NULL
+    ci = get_logit_ci(n, p, z)
   } else {stop("Invalid inference type specified; must be one of binomial,
-               logit_binomial")
+               logit")
   }
-  return(list(metric, est = p, var = se^2, se = se, ci_l = p - z*se, ci_u = p + z*se))
+  return(list(metric, est = p, var = se^2, se = se, ci_l = ci[1], ci_u = ci[2]))
 }
 
+# Function to get binomial confidence interval
 get_binomial_se <- function(n, p){
   sqrt((1/n)*p*(1-p))
+}
+
+# Function to get a logit-transform based confidence interval
+get_logit_ci <- function(n, p, z){
+  eta = log(p/1-p) #Translate using logit function
+  se_eta = (n*p*(1-p))^(-1/2)
+  eta_int = c(eta - z*se_eta, eta + z*se_eta)
+  return(c(plogis(eta - z*se_eta), plogis(eta + z*se_eta)))
 }
 
 #Some testing code
@@ -74,4 +85,4 @@ calculate_metric(predictions = X,
                  labels = Y, metric = "sens",
                  threshold_type = "prob",
                  threshold = .75,
-                 inference = "binomial")
+                 inference = "logit")
