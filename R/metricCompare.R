@@ -1,11 +1,12 @@
-# Sensitivity, Specificity, PPV, NPV Calculator
+# Sensitivity, Specificity, PPV, NPV Calculator and Comparison Tool
 #
 # This function calculates a comparison of two classifiers based on a specified
 # metric., either sensitivity, specificity, PPV, or NPV. These metrics are
 # require specification of a classification threshold, which can be provided as
 # either a predicted probability of the binary outcome (i.e. a value of the
 # score), or as a total positive rate (i.e. the threshold is chosen such that
-# X percent of the observations are classified as positives.
+# X percent of the observations are classified as positives, or as a constraint
+# on another of the metrics (e.g. sensitivity)
 #
 #
 compare_metric <- function(predictions1, predictions2, labels, comparison,
@@ -17,54 +18,49 @@ compare_metric <- function(predictions1, predictions2, labels, comparison,
   NULL
 }
 
-calculate_metric <- function(predictions,
-                             labels,
-                             metric = "ppv",
-                             threshold_type,
-                             threshold,
-                             inference,
-                             confidence = 0.95){
-  #Check Inputs
-  #If using total positive type, find threshold in terms of score
-  if (threshold_type == "prob"){
-    prob_threshold = threshold
-  } else if (threshold_type == "total_pos"){
-    prob_threshold = quantile(predictions, 1 - threshold)
-  } else {stop("Invalid threshold type specified; must be one of prob, total_pos")}
-  pos_preds = as.numeric(predictions > prob_threshold)
-  neg_preds = as.numeric(predictions < prob_threshold)
-  # Confusion Matrix
-  TP = sum(pos_preds*(labels==1))
-  FP = sum(pos_preds) - TP
-  TN = sum(neg_preds*(labels==0))
-  FN = sum(neg_preds) - TN
-  # And derived confusion matrix
-  ppv = TP/(TP + FP)
-  npv = TN/(TN + FN)
-  sens = TP/(TP + FN)
-  spec = TN/(TN + FP)
+# Return Confusion Matrix and Metrics at a Specified Probability Threshold
+cm_at_prob <- function(predictions, labels, prob){
+  TP = sum((predictions > prob)*(labels == 1))
+  FP = sum((predictions > prob)*(labels == 0))
+  FN = sum((predictions <= prob)*(labels == 1))
+  TN = sum((predictions <= prob)*(labels == 0))
 
-  # Get Requested Metric
-  if ( !(metric %in% c("ppv", "npv", "sens", "spec") ) ){
-    stop("Invalid metric specified, must be one of ppv, npv, sens, spec")
-  }
+  # To Return - No Inference Yet
+  return(data.frame(tp = TP, fp = FP, fn = FN, tn = TN,
+                    ppv = TP/(TP + FP), npv = TN/(TN + FN),
+                    sens = TP/(TP + FN), spec = TN/(TN + FP),
+                    prob = prob))
+}
 
-  # Standard Error Estimates - all of these metrics are in 0/1, one option is
-  # to assume they are a binomial parameter and use usual binomial SE calculation
-  z = -qnorm((1-confidence)/2)
-  n = length(labels)
-  p = get(metric)
-  se = NULL
-  if (inference  == "binomial"){
-    se = get_binomial_se(n, p)
-    ci = c(p - z*se, p + z*se)
-  } else if (inference == "logit"){
-    se = NULL
-    ci = get_logit_ci(n, p, z)
-  } else {stop("Invalid inference type specified; must be one of binomial,
-               logit")
-  }
-  return(list(metric, est = p, var = se^2, se = se, ci_l = ci[1], ci_u = ci[2]))
+# Return Confusion Matrix and Metrics at a Specified Sensitivity Level
+cm_at_sens <- function(predictions, labels, sens){
+  #Determine Required Probability Threshold to Get Desired Sensitivity
+  prob = quantile(predictions[labels==1], 1 - sens)
+  return(cm_at_prob(predictions, labels, prob))
+}
+
+# Return Confusion Matrix and Metrics at a Specified Specificty Level
+cm_at_spec <- function(predictions, labels, spec){
+  #Determine Required Probability Threshold to Get Desired Specificity
+  prob = quantile(predictions[labels==0], 1 - spec)
+  return(cm_at_prob(predictions, labels, prob))
+}
+
+# Return Confusion Matrix and Metrics at a Specified Number of Positive Preds
+cm_at_num_pos <- function(predictions, labels, num_pos){
+  preds_ordered = predictions[order(predictions, decreasing = T)]
+  prob = preds_ordered[num_pos]
+  return(cm_at_prob(predictions, labels, prob))
+}
+
+# Return Confusion Matrix and Metrics at a Specified PPV Threshold
+cm_at_ppv <- function(predictions, labels, ppv){
+  NULL
+}
+
+# Return Confusion Matrix and Metrics at a Specified NPV Threshold
+cm_at_npv <- function(predictions, labels, npv){
+  NULL
 }
 
 # Function to get binomial confidence interval
@@ -72,17 +68,41 @@ get_binomial_se <- function(n, p){
   sqrt((1/n)*p*(1-p))
 }
 
+# Function to get se on logit scale
+get_logit_se <- function(n, p){
+  NULL
+}
+
 # Function to get a logit-transform based confidence interval
-get_logit_ci <- function(n, p, z){
+get_logit_ci <- function(z, se, confidence){
   eta = log(p/1-p) #Translate using logit function
   se_eta = (n*p*(1-p))^(-1/2)
   eta_int = c(eta - z*se_eta, eta + z*se_eta)
   return(c(plogis(eta - z*se_eta), plogis(eta + z*se_eta)))
 }
 
-#Some testing code
-calculate_metric(predictions = X,
-                 labels = Y, metric = "sens",
-                 threshold_type = "prob",
-                 threshold = .75,
-                 inference = "logit")
+# Return Variance and Standard Error of a Specified Metric
+# confusion_mat is a dataframe with columns named
+# metric is the name of the column of interest
+get_metric_se <- function(predictions, labels, confusion_mat, metric, type){
+  n = length(labels)
+  p = confusion_mat[metric]
+  if (type  == "binomial"){
+    se = get_binomial_se(n, p)
+  } else if (type == "logit"){
+    se = get_logit_se(n, p)
+  } else {stop("Invalid inference type specified; must be one of binomial,
+               logit")
+  }
+  se
+}
+
+# Calculate Confidence Intervals
+
+### Testing Code ###
+test_preds = runif(1000)
+test_labels = rbinom(n = 1000, size = 1, p = test_preds)
+cm_at_sens(test_preds, test_labels, sens = .8)
+cmat <- cm_at_prob(test_preds, test_labels, prob = .5)
+
+get_metric_se(test_preds, test_labels, cmat, metric = "sens", type = "binomial")
