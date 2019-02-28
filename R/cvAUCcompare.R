@@ -8,6 +8,20 @@ source("./R/cvAUC_ic.R")
 source("./R/internals.R")
 source("./R/comparison_functions.R")
 
+#' Compare two cvAUC estimates based on the same observations and folds.
+#'
+#' @param predictions1
+#' @param predictions2
+#' @param labels
+#' @param label.ordering
+#' @param folds
+#' @param confidence
+#' @param comparison
+#'
+#' @return
+#' @export
+#'
+#' @examples
 cvAUCcompare <- function(predictions1, predictions2,
                          labels, label.ordering, folds=NULL,
                          confidence = 0.95, comparison = "diff"){

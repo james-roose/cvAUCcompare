@@ -5,8 +5,15 @@
 # using estimated influence curves
 #
 
-# Function for First-Order Delta Method Variance
-#
+#' Function for First-Order Delta Method Variance
+#'
+#' @param grad
+#' @param Sigma
+#'
+#' @return
+#' @export
+#'
+#' @examples
 delta_method <- function(grad, Sigma){
   t(grad)%*%Sigma%*%grad
 }

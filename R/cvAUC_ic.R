@@ -1,9 +1,16 @@
-# cvAUC_ic
-#
-# This function calculates the cross-validated AUC estimate and its influence
-# curve, variance, se and CI from a vector of predictions, a vector of true
-# outcomes and a list or vector of fold labels, as well as a confidence level
 source("./R/internals.R")
+#' Function to calculate influence function for cvAUC estimate.
+#'
+#' @param predictions1
+#' @param labels
+#' @param label.ordering
+#' @param folds
+#' @param confidence
+#'
+#' @return (list)
+#' @export
+#'
+#' @examples
 cvAUC_ic <- function(predictions1, labels, label.ordering = NULL, folds = NULL,
                      confidence = 0.95) {
 
