@@ -1,11 +1,11 @@
 source("./R/internals.R")
 #' Function to calculate influence function for cvAUC estimate.
 #'
-#' @param predictions1
-#' @param labels
+#' @param predictions1 A vector of predictions in (0, 1)
+#' @param labels A vector of truth labels (the outcomes, in {0,1})
 #' @param label.ordering
-#' @param folds
-#' @param confidence
+#' @param folds A vector of fold IDs or a list of folds
+#' @param confidence A numeric confidence level for confidence intervals
 #'
 #' @return (list)
 #' @export

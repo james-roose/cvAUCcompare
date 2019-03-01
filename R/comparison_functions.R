@@ -7,10 +7,10 @@
 
 #' Function for First-Order Delta Method Variance
 #'
-#' @param grad
-#' @param Sigma
+#' @param grad a numeric gradient vector
+#' @param Sigma a Covariance matrix (non-negative definite)
 #'
-#' @return
+#' @return the delta method calculation applied to gradient and Sigma
 #' @export
 #'
 #' @examples
@@ -19,8 +19,17 @@ delta_method <- function(grad, Sigma){
   t(grad)%*%Sigma%*%grad
 }
 
-# Difference
-# Function to Compute the Difference and the variance of the difference
+#' Apply Delta Method to Difference
+#'
+#' @param psi1 Estimate 1 of a parameter of interest
+#' @param psi2 Estimate 2 of a parameter of interest
+#' @param ic1 Vector of influence curve estimates for estimator 1
+#' @param ic2 Vector of influence curve estimates for estimator 2
+#'
+#' @return Difference and variance of difference
+#' @export
+#'
+#' @examples
 difference <- function(psi1, psi2, ic1, ic2){
   .check_inputs(psi1, psi2, ic1, ic2)
   n_obs = length(ic1)
@@ -33,8 +42,17 @@ difference <- function(psi1, psi2, ic1, ic2){
   return(list(h = h, var = var_h))
 }
 
-# Ratio
-# Function to Compute the Ratio in and the variance of the Ratio
+#' Apply Delta Method to Ratio
+#'
+#' @param psi1 Estimate 1 of a parameter of interest
+#' @param psi2 Estimate 2 of a parameter of interest
+#' @param ic1 Vector of influence curve estimates for estimator 1
+#' @param ic2 Vector of influence curve estimates for estimator 2
+#'
+#' @return Ratio and variance of ratio
+#' @export
+#'
+#' @examples
 ratio <- function(psi1, psi2, ic1, ic2){
   .check_inputs(psi1, psi2, ic1, ic2)
   n_obs = length(ic1)
@@ -48,8 +66,17 @@ ratio <- function(psi1, psi2, ic1, ic2){
   return(list(h = h, var_h = var_h))
 }
 
-# Log-Ratio
-# Function to Compute the log-ratio and the variance of the log ratio
+#' Apply Delta Method to Log Ratio
+#'
+#' @param psi1 Estimate 1 of a parameter of interest
+#' @param psi2 Estimate 2 of a parameter of interest
+#' @param ic1 Vector of influence curve estimates for estimator 1
+#' @param ic2 Vector of influence curve estimates for estimator 2
+#'
+#' @return Log ratio and variance of log ratio
+#' @export
+#'
+#' @examples
 logratio <- function(psi1, psi2, ic1, ic2){
   .check_inputs(psi1, psi2, ic1, ic2)
   n_obs = length(ic1)

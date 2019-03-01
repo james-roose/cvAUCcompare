@@ -9,6 +9,23 @@
 # on another of the metrics (e.g. sensitivity)
 #
 #
+
+
+#' Compare two non-AUC metrics
+#'
+#' @param predictions1 A vector of predictions in (0, 1) from estimator 1
+#' @param predictions2 A vector of predictions in (0, 1) from estimator 2
+#' @param labels A vector of truth labels (the outcomes, in {0,1})
+#' @param comparison Name of comparison, one of ("diff", "ratio", "log ratio")
+#' @param metric The metric of interest, one of ("sens", "spec", "ppv", "npv")
+#' @param threshold_type The type of threshold, one of ("prob", "v"sens", "spec", "ppv", "npv")
+#' @param threshold The value of the threshold to use
+#' @param confidence Confidence level for CI
+#'
+#' @return
+#' @export
+#'
+#' @examples
 compare_metric <- function(predictions1, predictions2, labels, comparison,
                            metric, threshold_type, threshold, confidence = 0.95){
   #Check Inputs
@@ -26,9 +43,14 @@ cm_at_prob <- function(predictions, labels, prob){
   TN = sum((predictions <= prob)*(labels == 0))
 
   # To Return - No Inference Yet
-  return(data.frame(tp = TP, fp = FP, fn = FN, tn = TN,
-                    ppv = TP/(TP + FP), npv = TN/(TN + FN),
-                    sens = TP/(TP + FN), spec = TN/(TN + FP),
+  return(data.frame(tp = TP,
+                    fp = FP,
+                    fn = FN,
+                    tn = TN,
+                    ppv = TP/(TP + FP),
+                    npv = TN/(TN + FN),
+                    sens = TP/(TP + FN),
+                    spec = TN/(TN + FP),
                     prob = prob))
 }
 
@@ -97,12 +119,9 @@ get_metric_se <- function(predictions, labels, confusion_mat, metric, type){
   se
 }
 
-# Calculate Confidence Intervals
+# Function to check a valid confusion matrix is passed in
+.check_metric_inputs(predictions1, predictions2, labels, comparison,
+                     metric, threshold_type, threshold, confidence = 0.95){
+  #Fill in with checks
 
-### Testing Code ###
-test_preds = runif(1000)
-test_labels = rbinom(n = 1000, size = 1, p = test_preds)
-cm_at_sens(test_preds, test_labels, sens = .8)
-cmat <- cm_at_prob(test_preds, test_labels, prob = .5)
-
-get_metric_se(test_preds, test_labels, cmat, metric = "spec", type = "binomial")
+}

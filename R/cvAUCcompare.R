@@ -8,17 +8,17 @@ source("./R/cvAUC_ic.R")
 source("./R/internals.R")
 source("./R/comparison_functions.R")
 
-#' Compare two cvAUC estimates based on the same observations and folds.
+#' Compare two cvAUC Estimates
 #'
-#' @param predictions1
-#' @param predictions2
-#' @param labels
+#' @param predictions1 A vector of predictions in (0, 1) from estimator 1
+#' @param predictions2 A vector of predictions in (0, 1) from estimator 2
+#' @param labels A vector of truth labels (the outcomes, in {0,1})
 #' @param label.ordering
-#' @param folds
-#' @param confidence
-#' @param comparison
+#' @param folds A vector of fold IDs or a list of folds
+#' @param confidence Confidence level for CI
+#' @param comparison Name of comparison, one of ("diff", "ratio", "log ratio")
 #'
-#' @return
+#' @return List of comparison name, metric, variance, se, CI of metric,
 #' @export
 #'
 #' @examples
