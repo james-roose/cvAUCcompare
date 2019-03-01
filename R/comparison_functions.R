@@ -15,7 +15,7 @@
 #'
 #' @examples
 delta_method <- function(grad, Sigma){
-  stopifnot(is.Matrix(Sigma))
+  stopifnot(is.matrix(Sigma))
   t(grad)%*%Sigma%*%grad
 }
 
