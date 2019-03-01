@@ -19,7 +19,7 @@ O = generate_data(nobs)
 fit1 <- glm(Y ~ X1 + X2, data = O, family = "binomial")
 p1 <- predict(fit1, newdata = O, type="response")
 #Fake 2:
-fit2 <- glm(Y ~ X1, data = O, family = "binomial")
+fit2 <- glm(Y ~ 1, data = O, family = "binomial")
 p2 <- predict(fit2, newdata = O, type="response")
 
 cvAUC1 <- cvAUC_ic(predictions1 = p1, labels = O$Y, confidence = 0.95)
@@ -44,7 +44,7 @@ compare_cvAUC(predictions1 = p1,
 compare_metric(predictions1 = p1,
              predictions2 = p2,
              labels = O$Y,
-             metric = "ppv",
+             metric = "npv",
              threshold_type = "sens",
              threshold = 0.2)
 
@@ -52,5 +52,5 @@ compare_metric(predictions1 = p1,
              predictions2 = p2,
              labels = O$Y,
              metric = "ppv",
-             threshold_type = "spec",
+             threshold_type = "prob",
              threshold = 0.5)
