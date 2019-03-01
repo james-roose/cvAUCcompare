@@ -38,25 +38,31 @@ compare_metric <- function(predictions1, predictions2, labels, comparison,
 
   ### Get Comparison of Interest for Specified Metric and Inference Using DM
   if (comparison == "diff"){
+    h = cm1[metric] - cm2[metric]
+    var_h1 = NULL #To be completed with variance calculation
+    var_h2 = NULL #To be completed with variance calculation
   NULL
   } else if (comparison == "ratio"){
+    h = cm1[metric]/cm2[metric]
   NULL
   } else if (comparison == "log_ratio"){
+    h = log(cm1[metric]) - log(cm2[metric])
   NULL
   }
 }
-
 
 # Function to get binomial confidence interval
 get_binomial_se <- function(n, p){
   sqrt((1/n)*p*(1-p))
 }
 
-
 # Function to get se on logit scale
 get_logit_se <- function(n, p){
   NULL
 }
+
+# Space for function to get IC based inference for sens, spec, ppv, npv
+
 
 # Function to get a logit-transform based confidence interval
 get_logit_ci <- function(z, se, confidence){
@@ -82,7 +88,7 @@ get_metric_se <- function(predictions, labels, confusion_mat, metric, type){
   se
 }
 
-# Function to check a valid confusion matrix is passed in
+# Function to check inputs for metric comparison
 .check_metric_inputs <- function(predictions1, predictions2, labels, comparison,
                      metric, threshold_type, threshold, confidence){
   stopifnot(metric != threshold_type)

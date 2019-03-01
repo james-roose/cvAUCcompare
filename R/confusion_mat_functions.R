@@ -1,7 +1,7 @@
 # Internal functions to calculate confusion matrices
 
 # Get CM at Specified threshold value of threshold_type
-get_cm_at_threshold(predictions, labels, threshold_type, threshold){
+get_cm_at_threshold <- function(predictions, labels, threshold_type, threshold){
   if (threshold_type == "prob"){
     cm <- cm_at_prob(predictions1, labels, threshold)
   } else if (threshold_type == "sens"){
