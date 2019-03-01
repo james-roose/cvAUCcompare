@@ -57,8 +57,6 @@ cvAUC_ic <- function(predictions1, labels, label.ordering = NULL, folds = NULL,
                 fold_labels = labels1,
                 MoreArgs = list(pos = pos1, neg = neg1, w1 = w1_1, w0 = w0_1))
 
-
-
   # Get cvAUC Value for Each
   # Requires cvAUC function
   cvauc1 <- cvAUC::cvAUC(predictions1, labels1, folds = folds1)$cvAUC
@@ -70,6 +68,10 @@ cvAUC_ic <- function(predictions1, labels, label.ordering = NULL, folds = NULL,
   ci_l = cvauc1 - z*se
   ci_u = cvauc1 + z*se
 
-  list(cvauc1 = cvauc1, var = var, se = se, ci_l = ci_l,
-       ci_u = ci_u, ic1 = ic1)
+  list(cvauc = cvauc1,
+       var = var,
+       se = se,
+       ci_l = ci_l,
+       ci_u = ci_u,
+       ic = ic1)
 }

@@ -32,11 +32,11 @@ compare_cvAUC <- function(predictions1,
 
   # Get One of 3 Measures of Interest
   if(comparison == "diff"){
-    res = difference(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
+    res = difference(cvAUC1$cvauc, cvAUC2$cvauc, ic1 = cvAUC1$ic, ic2 = cvAUC2$ic)
   } else if (comparison == "ratio"){
-    res = ratio(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
+    res = ratio(cvAUC1$cvauc, cvAUC2$cvauc, ic1 = cvAUC1$ic, ic2 = cvAUC2$ic)
   } else if (comparison == "log_ratio"){
-    res = logratio(cvAUC1[[1]], cvAUC2[[1]], cvAUC1[[2]], cvAUC2[[2]])
+    res = logratio(cvAUC1$cvauc, cvAUC2$cvauc, ic1 = cvAUC1$ic, ic2 = cvAUC2$ic)
     #Note should push CIs back onto original scale too
   } else {stop("Invalid comparison specified; must be one of diff, ratio, log_ratio") }
 

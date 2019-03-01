@@ -35,8 +35,13 @@ compare_metric <- function(predictions1,
                            confidence = 0.95,
                            se_type = "binomial"){
   #Check Inputs
-  .check_metric_inputs(predictions1, predictions2, labels, comparison,
-                       metric, threshold_type, threshold, confidence)
+  .check_metric_inputs(predictions1 = predictions1,
+                       predictions2 = predictions2,
+                       labels = labels,
+                       metric = metric,
+                       threshold_type = threshold_type,
+                       threshold = threshold,
+                       confidence = confidence)
 
   ### Get Confusion Matrices at specified Threshold
   cm1 <- get_cm_at_threshold(predictions1, labels, threshold_type, threshold)
@@ -47,30 +52,33 @@ compare_metric <- function(predictions1,
   metric1_se = get_metric_se(n = length(predictions1),
                              p = metric1,
                              se_type = se_type)
-  metric1_ci = c(metric1 + qnorm((1-confidence)/2), metric1 - qnorm((1-confidence)/2))
+  metric1_ci = get_ci(mean = metric1, se = metric1_se, confidence = confidence)
   metric2 = cm2[metric]
   metric2_se = get_metric_se(n = length(predictions2),
                              p = metric2,
                              se_type = se_type)
-  metric2_ci = c(metric2 + qnorm((1-confidence)/2), metric2 - qnorm((1-confidence)/2))
+  metric2_ci = get_ci(mean = metric2, se = metric2_se, confidence = confidence)
 
   diff = metric1 - metric2
   ratio = metric1/metric2
   log_ratio = log(metric1) - log(metric2)
-  return(list(summary = data.frame(estimator = c("psi1", "psi2"),
-                                   estimate = c(metric1, metric2),
-                                   se = c(metric1_se, metric2_se),
-                                   ci_lower = c(metric1_ci[1], metric2_ci[1]),
-                                   ci_upper = c(metric1_ci[2], metric2_ci[2])),
+  return(list(summary = data.frame(estimator = rbind("psi1", "psi2"),
+                                   estimate = rbind(metric1, metric2),
+                                   se = rbind(metric1_se, metric2_se),
+                                   ci_lower = rbind(metric1_ci[1], metric2_ci[1]),
+                                   ci_upper = rbind(metric1_ci[2], metric2_ci[2])),
               comparison = c(diff = diff, ratio = ratio, log_ratio = log_ratio)))
 }
 
 
-# Function to get binomial confidence interval
+# Function to get binomial standard error estimate for proportion p, sample size n
 get_binomial_se <- function(n, p){
-  se = sqrt((1/n)*p*(1-p))
-  var = (1/n)*p*(1-p)
-  return(data.frame(se = se, var = var))
+  sqrt((1/n)*p*(1-p))
+}
+
+#Function to get confidence interval given se, confidence level using normal approx
+get_ci <- function(mean, se, confidence){
+  c(mean + se*qnorm((1-confidence)/2), mean - se*qnorm((1-confidence)/2))
 }
 
 # Function to get se on logit scale
@@ -95,15 +103,15 @@ get_logit_ci <- function(z, se, confidence){
 # Return Variance and Standard Error of a Specified Metric
 # confusion_mat is a dataframe with columns named
 # metric is the name of the column of interest
-get_metric_se <- function(n, p, se_type){
-  if (s_etype  == "binomial"){
-    se = get_binomial_se(n, p)$se
+get_metric_se <- function(n, p, se_type = "binomial"){
+  if (se_type  == "binomial"){
+    se = get_binomial_se(n, p)
   } else if (se_type == "logit"){
-    se = get_logit_se(n, p)$se
+    se = get_logit_se(n, p)
   } else {stop("Invalid inference type specified; must be one of binomial,
                logit")
   }
-  se
+  return(se)
 }
 
 # Function to check inputs for metric comparison
@@ -112,7 +120,7 @@ get_metric_se <- function(n, p, se_type){
   stopifnot(metric != threshold_type)
   stopifnot(metric %in% c("sens", "spec", "ppv", "npv"))
   stopifnot(threshold_type %in% c("sens", "spec", "prob"))
-  stopifnot(threshold >= 0 & threshold <= 1)
+  stopifnot(threshold > 0 & threshold < 1)
   stopifnot(confidence > 0 & confidence < 1)
   stopifnot(length(predictions1) == length(predictions2))
   stopifnot(length(labels) == length(predictions1))
