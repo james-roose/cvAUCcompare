@@ -1,11 +1,7 @@
-files <- list.files("./R/")
-for (f in files[1:5]) {
-  source(file.path("./R", f))
-}
-
 ### Some code to test the functions
 set.seed(1222)
 nobs = 5100
+
 generate_data <- function(nobs){
   X1 = runif(n= nobs)
   X2 = runif(n= nobs)
@@ -29,10 +25,32 @@ p2 <- predict(fit2, newdata = O, type="response")
 cvAUC1 <- cvAUC_ic(predictions1 = p1, labels = O$Y, confidence = 0.95)
 cvAUC2 <- cvAUC_ic(predictions1 = p2, labels = O$Y, confidence = 0.95)
 
-cvAUCcompare(predictions1 = p1,
+compare_cvAUC(predictions1 = p1,
              predictions2 = p2,
              labels = O$Y,
              label.ordering = NULL,
              folds = NULL,
              confidence = 0.95,
-             method = "diff")
+             comparison = "diff")
+
+compare_cvAUC(predictions1 = p1,
+             predictions2 = p2,
+             labels = O$Y,
+             label.ordering = NULL,
+             folds = NULL,
+             confidence = 0.95,
+             comparison = "ratio")
+
+compare_metric(predictions1 = p1,
+             predictions2 = p2,
+             labels = O$Y,
+             metric = "ppv",
+             threshold_type = "sens",
+             threshold = "0.50")
+
+compare_metric(predictions1 = p1,
+             predictions2 = p2,
+             labels = O$Y,
+             metric = "ppv",
+             threshold_type = "spec",
+             threshold = "0.50")
