@@ -3,13 +3,13 @@
 # Get CM at Specified threshold value of threshold_type
 get_cm_at_threshold <- function(predictions, labels, threshold_type, threshold){
   if (threshold_type == "prob"){
-    cm <- cm_at_prob(predictions1, labels, threshold)
+    cm <- cm_at_prob(predictions, labels, threshold)
   } else if (threshold_type == "sens"){
-    cm <- cm_at_sens(predictions1, labels, threshold)
+    cm <- cm_at_sens(predictions, labels, threshold)
   } else if (threshold_type == "spec"){
-    cm <- cm_at_spec(predictions1, labels, threshold)
+    cm <- cm_at_spec(predictions, labels, threshold)
   } else if (threshold_type == "total_pos"){
-    cm <- cm_at_total_pos(predictions1, labels, threshold)
+    cm <- cm_at_total_pos(predictions, labels, threshold)
   }
 }
 
