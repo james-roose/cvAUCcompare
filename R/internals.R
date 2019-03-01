@@ -1,7 +1,8 @@
 # internals
 #
 # This package builds extensively on the cvAUC package. This file contains
-# internal functions from the cvAUC package used for verifying inputs.
+# internal functions from the cvAUC package used for verifying inputs and
+# coercing them to a format for the cvAUC_ic function.
 #
 #
 #

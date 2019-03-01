@@ -11,7 +11,7 @@
 # These comparisons use parametric assumptions for inference and the empirical
 # distribution for estimation.
 
-#' Compare two non-AUC metrics
+#' Compare two non-AUC metrics at either a classification threshold or a constraint
 #'
 #' @param predictions1 A vector of predictions in (0, 1) from estimator 1
 #' @param predictions2 A vector of predictions in (0, 1) from estimator 2
@@ -48,14 +48,14 @@ compare_metric <- function(predictions1,
   cm2 <- get_cm_at_threshold(predictions2, labels, threshold_type, threshold)
 
   # Summary Tables
-  metric1 = unlist(metric_summary(predictions1,
+  metric1 = unlist(summarize_metric(predictions1,
                            labels = labels,
                            metric = metric,
                            threshold_type = threshold_type,
                            threshold = threshold,
                            confidence = confidence))
   m1 = metric1[1]
-  metric2 = unlist(metric_summary(predictions2,
+  metric2 = unlist(summarize_metric(predictions2,
                            labels = labels,
                            metric = metric,
                            threshold_type = threshold_type,
@@ -74,14 +74,27 @@ compare_metric <- function(predictions1,
 }
 
 
-# Function to Summarize a Single Prediction Function at Specified Metric, Threshold, etc.
-metric_summary <- function(predictions,
-                           labels,
-                           metric,
-                           threshold_type,
-                           threshold,
-                           confidence = 0.95,
-                           se_type = "binomial"){
+#' Summarize a single estimator's performance
+#'
+#' @param predictions A vector of predictions in (0, 1) from an estimator
+#' @param labels A vector of truth labels (the outcomes, in {0,1})
+#' @param metric The metric of interest, one of ("sens", "spec", "ppv", "npv")
+#' @param threshold_type One of ("prob", "sens", "spec", "total_pos"), and not equal to metric
+#' @param threshold The value of the threshold to use
+#' @param confidence Confidence level for CI
+#' @param se_type One of c("binomial", "logit"), defaults to "binomial"
+#'
+#' @return
+#' @export
+#'
+#' @examples
+summarize_metric <- function(predictions,
+                             labels,
+                             metric,
+                             threshold_type,
+                             threshold,
+                             confidence = 0.95,
+                             se_type = "binomial"){
 
   ### Get Confusion Matrix at specified Threshold
   cm <- get_cm_at_threshold(predictions, labels, threshold_type, threshold)
