@@ -1,5 +1,4 @@
-source("./R/internals.R")
-#' Function to calculate influence function for cvAUC estimate.
+#' Calculate influence function for cvAUC estimate.
 #'
 #' @param predictions1 A vector of predictions in (0, 1)
 #' @param labels A vector of truth labels (the outcomes, in {0,1})
@@ -8,6 +7,7 @@ source("./R/internals.R")
 #' @param confidence A numeric confidence level for confidence intervals
 #'
 #' @return (list)
+#' @import data.table
 #' @export
 #'
 #' @examples
@@ -43,9 +43,14 @@ cvAUC_ic <- function(predictions1, labels, label.ordering = NULL, folds = NULL,
     n_neg <- n_rows - n_pos
     auc <- cvAUC::AUC(fold_preds, fold_labels)
     DT <- data.table(pred = fold_preds, label = fold_labels)
+    #  print(head(DT))
     DT <- DT[order(pred, -xtfrm(label))]  #Sort by asc(pred), desc(label)
+    #DT <- setorder(DT, pred, -label)
+    # print(class(DT))
+    # print(head(DT))
     DT[, fracNegLabelsWithSmallerPreds := cumsum(label == neg)/n_neg]
     DT <- DT[order(-pred, label)]
+    #DT <- setorder(DT, -pred, label) #Sort by desc(pred), asc(label)
     DT[, fracPosLabelsWithLargerPreds := cumsum(label == pos)/n_pos]
     DT[, icVal := ifelse(label == pos, w1 * (fracNegLabelsWithSmallerPreds - auc),
                          w0 * (fracPosLabelsWithLargerPreds - auc))]

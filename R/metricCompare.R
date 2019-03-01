@@ -7,18 +7,18 @@
 # score), or as a total positive rate (i.e. the threshold is chosen such that
 # X percent of the observations are classified as positives, or as a constraint
 # on another of the metrics (e.g. sensitivity)
-#
-#
 
+# These comparisons use parametric assumptions for inference and the empirical
+# distribution for estimation.
 
 #' Compare two non-AUC metrics
 #'
 #' @param predictions1 A vector of predictions in (0, 1) from estimator 1
 #' @param predictions2 A vector of predictions in (0, 1) from estimator 2
 #' @param labels A vector of truth labels (the outcomes, in {0,1})
-#' @param comparison Name of comparison, one of ("diff", "ratio", "log ratio")
+#' @param comparison Name of comparison, one of ("diff", "ratio", "log_ratio")
 #' @param metric The metric of interest, one of ("sens", "spec", "ppv", "npv")
-#' @param threshold_type The type of threshold, one of ("prob", "v"sens", "spec", "ppv", "npv")
+#' @param threshold_type One of ("prob", "sens", "spec", "total_pos"), and not equal to metric
 #' @param threshold The value of the threshold to use
 #' @param confidence Confidence level for CI
 #'
@@ -29,10 +29,32 @@
 compare_metric <- function(predictions1, predictions2, labels, comparison,
                            metric, threshold_type, threshold, confidence = 0.95){
   #Check Inputs
-  #If using total positive type, find threshold in terms of score
-  #Calculate Confusion Matrix and Metrics of Interest
-  #Get Comparisons and Inference via Delta Method
+  .check_metric_inputs(predictions1, predictions2, labels, comparison,
+                       metric, threshold_type, threshold, confidence)
+
+  ### Get Confusion Matrix for Specified Threshold
+  if (threshold_type == "prob"){
+    cm1 <- cm_at_prob(predictions1, labels, threshold)
+    cm2 <- cm_at_prob(predictions2, labels, threshold)
+  } else if (threshold_type == "sens"){
+    cm1 <- cm_at_sens(predictions1, labels, threshold)
+    cm2 <- cm_at_sens(predictions2, labels, threshold)
+  } else if (threshold_type == "spec"){
+    cm1 <- cm_at_spec(predictions1, labels, threshold)
+    cm2 <- cm_at_spec(predictions2, labels, threshold)
+  } else if (threshold_type == "total_pos"){
+    cm1 <- cm_at_num_pos(predictions1, labels, threshold)
+    cm2 <- cm_at_num_pos(predictions2, labels, threshold)
+  }
+
+  ### Get Comparison of Interest for Specified Metric and Inference Using DM
+  if (comparison == "diff"){
   NULL
+  } else if (comparison == "ratio"){
+  NULL
+  } else if (comparison == "log_ratio"){
+  NULL
+  }
 }
 
 # Return Confusion Matrix and Metrics at a Specified Probability Threshold
@@ -75,20 +97,11 @@ cm_at_num_pos <- function(predictions, labels, num_pos){
   return(cm_at_prob(predictions, labels, prob))
 }
 
-# Return Confusion Matrix and Metrics at a Specified PPV Threshold
-cm_at_ppv <- function(predictions, labels, ppv){
-  NULL
-}
-
-# Return Confusion Matrix and Metrics at a Specified NPV Threshold
-cm_at_npv <- function(predictions, labels, npv){
-  NULL
-}
-
 # Function to get binomial confidence interval
 get_binomial_se <- function(n, p){
   sqrt((1/n)*p*(1-p))
 }
+
 
 # Function to get se on logit scale
 get_logit_se <- function(n, p){
@@ -120,8 +133,13 @@ get_metric_se <- function(predictions, labels, confusion_mat, metric, type){
 }
 
 # Function to check a valid confusion matrix is passed in
-.check_metric_inputs(predictions1, predictions2, labels, comparison,
-                     metric, threshold_type, threshold, confidence = 0.95){
-  #Fill in with checks
-
+.check_metric_inputs <- function(predictions1, predictions2, labels, comparison,
+                     metric, threshold_type, threshold, confidence){
+  stopifnot(metric != threshold_type)
+  stopifnot(metric %in% c("sens", "spec", "ppv", "npv"))
+  stopifnot(threshold_type %in% c("sens", "spec", "prob"))
+  stopifnot(threshold >= 0 & threshold <= 1)
+  stopifnot(confidence > 0 & confidence < 1)
+  stopifnot(length(predictions1) == length(predictions2))
+  stopifnot(length(labels) == length(predictions1))
 }

@@ -4,9 +4,6 @@
 # given two sets of scores, one set of outcomes and one set of folds. The folds
 # and outcomes must be the same for both cvAUC estimates.
 #
-source("./R/cvAUC_ic.R")
-source("./R/internals.R")
-source("./R/comparison_functions.R")
 
 #' Compare two cvAUC Estimates
 #'

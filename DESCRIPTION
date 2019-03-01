@@ -3,7 +3,7 @@ Type: Package
 Title: Tools for Comparing Binary Classifiers
 Version: 0.1.1
 Author: James Roose
-Maintainer: James Roose (jroose9@gmail.com)
+Maintainer: James Roose <jroose9@gmail.com>
 Description: Contains functions to comparing and evaluating binary classifiers. 
 	Base functions calculate metrics: sensitivity, specificity, ppv, npv at a 
 	specified classification threshold or constraint on another metric. Extensions
@@ -13,7 +13,8 @@ Description: Contains functions to comparing and evaluating binary classifiers.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-Depends:
+Depends: R (>= 3.1.0),
     ROCR,
+    data.table (>= 1.12.0),
     cvAUC
-Imports:
+RoxygenNote: 6.1.1

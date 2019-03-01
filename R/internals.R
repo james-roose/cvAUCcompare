@@ -6,7 +6,8 @@
 #
 #
 # Internal functions for the cvAUC package
-.process_input <- function(predictions, labels, label.ordering = NULL, folds = NULL, ids = NULL, confidence = NULL){
+.process_input <- function(predictions, labels, label.ordering = NULL, folds = NULL,
+                           ids = NULL, confidence = NULL){
 
   # If 'folds' is specified as a list or vector, 'predictions'
   # and 'labels' must be specified as a vector and will be
@@ -45,19 +46,11 @@
       stop("Number of folds cannot exceed the number of observations.")
     }
   }
-  # Might add more checking for AUC function; Something like this:
-  #else {
-  #  if (length(unique(unlist(labels))) != 2) {
-  #    stop("AUC only implemented for binary response")
-  #  }
-  #  if (length(predictions) != length(labels)) {
-  #    stop("predictions and labels must be equal length")
-  #  }
-  #}
 
   #Process predictions/labels arguments using ROCR prediction function
-  pred <- ROCR::prediction(predictions = predictions, labels = labels,
-                     label.ordering = label.ordering)
+  pred <- ROCR::prediction(predictions = predictions,
+                           labels = labels,
+                           label.ordering = label.ordering)
   predictions <- pred@predictions
   labels <- pred@labels
 
