@@ -19,9 +19,13 @@
 #' @export
 #'
 #' @examples
-cvAUCcompare <- function(predictions1, predictions2,
-                         labels, label.ordering, folds=NULL,
-                         confidence = 0.95, comparison = "diff"){
+compare_cvAUC <- function(predictions1,
+                          predictions2,
+                          labels,
+                          label.ordering,
+                          folds=NULL,
+                          confidence = 0.95,
+                          comparison = "diff"){
   # Obtain cvAUC Estimates and Influence Curves
   cvAUC1 = cvAUC_ic(predictions1, labels, label.ordering, folds, confidence)
   cvAUC2 = cvAUC_ic(predictions2, labels, label.ordering, folds, confidence)

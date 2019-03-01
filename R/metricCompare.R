@@ -107,7 +107,7 @@ get_metric_se <- function(n, p, se_type){
 }
 
 # Function to check inputs for metric comparison
-.check_metric_inputs <- function(predictions1, predictions2, labels, comparison,
+.check_metric_inputs <- function(predictions1, predictions2, labels,
                      metric, threshold_type, threshold, confidence){
   stopifnot(metric != threshold_type)
   stopifnot(metric %in% c("sens", "spec", "ppv", "npv"))
