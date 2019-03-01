@@ -47,29 +47,55 @@ compare_metric <- function(predictions1,
   cm1 <- get_cm_at_threshold(predictions1, labels, threshold_type, threshold)
   cm2 <- get_cm_at_threshold(predictions2, labels, threshold_type, threshold)
 
-  ### Get Comparison of Interest for Specified Metric and Inference Using DM
-  metric1 = cm1[metric]
-  metric1_se = get_metric_se(n = length(predictions1),
-                             p = metric1,
-                             se_type = se_type)
-  metric1_ci = get_ci(mean = metric1, se = metric1_se, confidence = confidence)
-  metric2 = cm2[metric]
-  metric2_se = get_metric_se(n = length(predictions2),
-                             p = metric2,
-                             se_type = se_type)
-  metric2_ci = get_ci(mean = metric2, se = metric2_se, confidence = confidence)
+  # Summary Tables
+  metric1 = unlist(metric_summary(predictions1,
+                           labels = labels,
+                           metric = metric,
+                           threshold_type = threshold_type,
+                           threshold = threshold,
+                           confidence = confidence))
+  m1 = metric1[1]
+  metric2 = unlist(metric_summary(predictions2,
+                           labels = labels,
+                           metric = metric,
+                           threshold_type = threshold_type,
+                           threshold = threshold,
+                           confidence = confidence))
+  m2 = metric2[1]
 
-  diff = metric1 - metric2
-  ratio = metric1/metric2
-  log_ratio = log(metric1) - log(metric2)
-  return(list(summary = data.frame(estimator = rbind("psi1", "psi2"),
-                                   estimate = rbind(metric1, metric2),
-                                   se = rbind(metric1_se, metric2_se),
-                                   ci_lower = rbind(metric1_ci[1], metric2_ci[1]),
-                                   ci_upper = rbind(metric1_ci[2], metric2_ci[2])),
+
+  #Comparisons
+  diff = m1 - m2
+  ratio = m1/m2
+  log_ratio = log(m1) - log(m2)
+
+  return(list(summary = data.frame(rbind(metric1, metric2)),
               comparison = c(diff = diff, ratio = ratio, log_ratio = log_ratio)))
 }
 
+
+# Function to Summarize a Single Prediction Function at Specified Metric, Threshold, etc.
+metric_summary <- function(predictions,
+                           labels,
+                           metric,
+                           threshold_type,
+                           threshold,
+                           confidence = 0.95,
+                           se_type = "binomial"){
+
+  ### Get Confusion Matrix at specified Threshold
+  cm <- get_cm_at_threshold(predictions, labels, threshold_type, threshold)
+
+  ### Get Metric of Interest Summary
+  metric = cm[metric]
+  metric_se = get_metric_se(n = length(predictions),
+                             p = metric,
+                             se_type = se_type)
+  metric_ci = get_ci(mean = unlist(metric), se = unlist(metric_se), confidence = confidence)
+
+  summary = data.frame(c(target = metric, se = metric_se, ci_lower = metric_ci[1], ci_upper = metric_ci[2]))
+  return(summary)
+}
 
 # Function to get binomial standard error estimate for proportion p, sample size n
 get_binomial_se <- function(n, p){
@@ -77,8 +103,8 @@ get_binomial_se <- function(n, p){
 }
 
 #Function to get confidence interval given se, confidence level using normal approx
-get_ci <- function(mean, se, confidence){
-  c(mean + se*qnorm((1-confidence)/2), mean - se*qnorm((1-confidence)/2))
+get_ci <- function(mean, se, confidence) {
+  return(unlist( c(mean + se*qnorm((1-confidence)/2), mean - se*qnorm((1-confidence)/2))))
 }
 
 # Function to get se on logit scale
