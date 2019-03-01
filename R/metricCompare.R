@@ -32,20 +32,9 @@ compare_metric <- function(predictions1, predictions2, labels, comparison,
   .check_metric_inputs(predictions1, predictions2, labels, comparison,
                        metric, threshold_type, threshold, confidence)
 
-  ### Get Confusion Matrix for Specified Threshold
-  if (threshold_type == "prob"){
-    cm1 <- cm_at_prob(predictions1, labels, threshold)
-    cm2 <- cm_at_prob(predictions2, labels, threshold)
-  } else if (threshold_type == "sens"){
-    cm1 <- cm_at_sens(predictions1, labels, threshold)
-    cm2 <- cm_at_sens(predictions2, labels, threshold)
-  } else if (threshold_type == "spec"){
-    cm1 <- cm_at_spec(predictions1, labels, threshold)
-    cm2 <- cm_at_spec(predictions2, labels, threshold)
-  } else if (threshold_type == "total_pos"){
-    cm1 <- cm_at_num_pos(predictions1, labels, threshold)
-    cm2 <- cm_at_num_pos(predictions2, labels, threshold)
-  }
+  ### Get Confusion Matrices at specified Threshold
+  cm1 <- get_cm_at_threshold(predictions1, labels, threshold_type, threshold)
+  cm2 <- get_cm_at_threshold(predictions2, labels, threshold_type, threshold)
 
   ### Get Comparison of Interest for Specified Metric and Inference Using DM
   if (comparison == "diff"){
@@ -57,45 +46,6 @@ compare_metric <- function(predictions1, predictions2, labels, comparison,
   }
 }
 
-# Return Confusion Matrix and Metrics at a Specified Probability Threshold
-cm_at_prob <- function(predictions, labels, prob){
-  TP = sum((predictions > prob)*(labels == 1))
-  FP = sum((predictions > prob)*(labels == 0))
-  FN = sum((predictions <= prob)*(labels == 1))
-  TN = sum((predictions <= prob)*(labels == 0))
-
-  # To Return - No Inference Yet
-  return(data.frame(tp = TP,
-                    fp = FP,
-                    fn = FN,
-                    tn = TN,
-                    ppv = TP/(TP + FP),
-                    npv = TN/(TN + FN),
-                    sens = TP/(TP + FN),
-                    spec = TN/(TN + FP),
-                    prob = prob))
-}
-
-# Return Confusion Matrix and Metrics at a Specified Sensitivity Level
-cm_at_sens <- function(predictions, labels, sens){
-  #Determine Required Probability Threshold to Get Desired Sensitivity
-  prob = quantile(predictions[labels==1], 1 - sens)
-  return(cm_at_prob(predictions, labels, prob))
-}
-
-# Return Confusion Matrix and Metrics at a Specified Specificty Level
-cm_at_spec <- function(predictions, labels, spec){
-  #Determine Required Probability Threshold to Get Desired Specificity
-  prob = quantile(predictions[labels==0], 1 - spec)
-  return(cm_at_prob(predictions, labels, prob))
-}
-
-# Return Confusion Matrix and Metrics at a Specified Number of Positive Preds
-cm_at_num_pos <- function(predictions, labels, num_pos){
-  preds_ordered = predictions[order(predictions, decreasing = T)]
-  prob = preds_ordered[num_pos]
-  return(cm_at_prob(predictions, labels, prob))
-}
 
 # Function to get binomial confidence interval
 get_binomial_se <- function(n, p){
