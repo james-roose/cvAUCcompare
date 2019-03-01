@@ -9,7 +9,7 @@ get_cm_at_threshold <- function(predictions, labels, threshold_type, threshold){
   } else if (threshold_type == "spec"){
     cm <- cm_at_spec(predictions1, labels, threshold)
   } else if (threshold_type == "total_pos"){
-    cm <- cm_at_num_pos(predictions1, labels, threshold)
+    cm <- cm_at_total_pos(predictions1, labels, threshold)
   }
 }
 
