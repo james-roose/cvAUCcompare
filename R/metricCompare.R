@@ -138,11 +138,8 @@ get_ic_inference <- function(n, psi1, psi2, ic1, ic2){
 }
 
 # Function to get a logit-transform based confidence interval for 1 estimator
-get_logit_ci <- function(z, se, confidence){
-  eta = log(p/(1-p)) #Translate using logit function
-  se_eta = sqrt(n*p*(1-p))
-  eta_int = c(eta - z*se_eta, eta + z*se_eta)
-  return(c(plogis(eta - z*se_eta), plogis(eta + z*se_eta)))
+get_logit_ci <- function(p, confidence){
+  NULL
 }
 
 # Return Variance and Standard Error of a Specified Metric
