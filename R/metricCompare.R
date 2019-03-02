@@ -15,7 +15,7 @@
 #'
 #' @param predictions1 A vector of predictions in (0, 1) from estimator 1
 #' @param predictions2 A vector of predictions in (0, 1) from estimator 2
-#' @param labels A vector of truth labels (the outcomes, in {0,1})
+#' @param labels A vector of binary truth labels
 #' @param metric The metric of interest, one of ("sens", "spec", "ppv", "npv")
 #' @param threshold_type One of ("prob", "sens", "spec", "total_pos"), and not equal to metric
 #' @param threshold The value of the threshold to use
@@ -96,6 +96,12 @@ summarize_metric <- function(predictions,
                              confidence = 0.95,
                              se_type = "binomial"){
 
+  .check_met_summary_inputs(predictions = predictions,
+                            labels = labels,
+                            metric = metric,
+                            threshold_type = threshold_type,
+                            threshold = threshold)
+
   ### Get Confusion Matrix at specified Threshold
   cm <- get_cm_at_threshold(predictions, labels, threshold_type, threshold)
 
@@ -163,4 +169,17 @@ get_metric_se <- function(n, p, se_type = "binomial"){
   stopifnot(confidence > 0 & confidence < 1)
   stopifnot(length(predictions1) == length(predictions2))
   stopifnot(length(labels) == length(predictions1))
+}
+
+# Function to check inputs for metric summary
+.check_met_summary_inputs <- function(predictions = predictions,
+                                      labels = labels,
+                                      metric = metric,
+                                      threshold_type = threshold_type,
+                                      threshold = threshold){
+  stopifnot(metric != threshold_type)
+  stopifnot(metric %in% c("sens", "spec", "ppv", "npv"))
+  stopifnot(threshold_type %in% c("sens", "spec", "prob"))
+  stopifnot(threshold > 0 & threshold < 1)
+  stopifnot(length(labels) == length(predictions))
 }
