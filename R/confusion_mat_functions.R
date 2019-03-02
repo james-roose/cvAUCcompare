@@ -1,6 +1,17 @@
-# Internal functions to calculate confusion matrices
+# Functions to calculate confusion matrices - returned as a named vector
 
 # Get CM at Specified threshold value of threshold_type
+#' Title
+#'
+#' @param predictions A vector of predictions in (0, 1) from estimator
+#' @param labels A vector of binary truth labels
+#' @param threshold_type One of ("prob", "sens", "spec", "total_pos")
+#' @param threshold The value of the threshold to use
+#'
+#' @return A named vector containing entries of confusion matrix
+#' @export
+#'
+#' @examples
 get_cm_at_threshold <- function(predictions, labels, threshold_type, threshold){
   if (threshold_type == "prob"){
     cm <- cm_at_prob(predictions, labels, threshold)
@@ -14,7 +25,7 @@ get_cm_at_threshold <- function(predictions, labels, threshold_type, threshold){
 }
 
 # Return Confusion Matrix and Metrics at a Specified Probability Threshold
-cm_at_prob <- function(predictions, labels, prob){
+.cm_at_prob <- function(predictions, labels, prob){
   TP = sum((predictions > prob)*(labels == 1))
   FP = sum((predictions > prob)*(labels == 0))
   FN = sum((predictions <= prob)*(labels == 1))
@@ -33,21 +44,21 @@ cm_at_prob <- function(predictions, labels, prob){
 }
 
 # Return Confusion Matrix and Metrics at a Specified Sensitivity Level
-cm_at_sens <- function(predictions, labels, sens){
+.cm_at_sens <- function(predictions, labels, sens){
   #Determine Required Probability Threshold to Get Desired Sensitivity
   prob = quantile(predictions[labels==1], 1 - sens)
   return(cm_at_prob(predictions, labels, prob))
 }
 
 # Return Confusion Matrix and Metrics at a Specified Specificty Level
-cm_at_spec <- function(predictions, labels, spec){
+.cm_at_spec <- function(predictions, labels, spec){
   #Determine Required Probability Threshold to Get Desired Specificity
   prob = quantile(predictions[labels==0], 1 - spec)
   return(cm_at_prob(predictions, labels, prob))
 }
 
 # Return Confusion Matrix and Metrics at a Specified Number of Positive Preds
-cm_at_total_pos <- function(predictions, labels, total_pos){
+.cm_at_total_pos <- function(predictions, labels, total_pos){
   preds_ordered = predictions[order(predictions, decreasing = T)]
   prob = preds_ordered[total_pos]
   return(cm_at_prob(predictions, labels, prob))
