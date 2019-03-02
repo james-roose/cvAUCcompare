@@ -16,7 +16,7 @@ O = generate_data(nobs)
 fit1 <- glm(Y ~ X1 + X2, data = O, family = "binomial")
 p1 <- predict(fit1, newdata = O, type="response")
 #Fake 2:
-fit2 <- glm(Y ~ 1, data = O, family = "binomial")
+fit2 <- glm(Y ~ X1, data = O, family = "binomial")
 p2 <- predict(fit2, newdata = O, type="response")
 
 # Get cvAUC estimates and ICs
@@ -43,15 +43,21 @@ compare_cvAUC(predictions1 = p1,
 # Test Sample Metric Comparisons
 met_list = c("ppv", "npv", "sens", "spec")
 cons_list = c("sens", "spec")
+ci_list = c("binomial", "logit")
 for (met in met_list){
   for (cons in cons_list){
-    if (met != cons){
-      print(compare_metric(predictions1 = p1,
-                           predictions2 = p2,
-                           labels = O$Y,
-                           metric = met,
-                           threshold_type = cons,
-                           threshold = .5))
+    for (ci_type in ci_list){
+      if (met != cons){
+        print(c(met, cons, ci_type))
+
+        print(compare_metric(predictions1 = p1,
+                             predictions2 = p2,
+                             labels = O$Y,
+                             metric = met,
+                             threshold_type = cons,
+                             threshold = .5,
+                             ci_type = ci_type))
+      }
     }
   }
 }
