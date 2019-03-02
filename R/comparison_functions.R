@@ -5,20 +5,6 @@
 # using estimated influence curves
 #
 
-#' Function for First-Order Delta Method Variance
-#'
-#' @param grad a numeric gradient vector
-#' @param Sigma a Covariance matrix (non-negative definite)
-#'
-#' @return the delta method calculation applied to gradient and Sigma
-#' @export
-#'
-#' @examples
-delta_method <- function(grad, Sigma){
-  stopifnot(is.matrix(Sigma))
-  t(grad)%*%Sigma%*%grad
-}
-
 #' Apply Delta Method to Difference
 #'
 #' @param psi1 Estimate 1 of a parameter of interest
@@ -88,6 +74,12 @@ logratio <- function(psi1, psi2, ic1, ic2){
 
   var_h = (1/nobs)*delta_method(grad, Sigma)
   return(list(h = h, var_h = var_h))
+}
+
+# Function for First-Order Delta Method Variance
+.delta_method <- function(grad, Sigma){
+  stopifnot(is.matrix(Sigma))
+  t(grad)%*%Sigma%*%grad
 }
 
 # Function to check inputs for 3 IC based comparison functions
