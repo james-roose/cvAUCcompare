@@ -11,10 +11,7 @@ generate_data <- function(nobs){
   return(O)
 }
 O = generate_data(nobs)
-# folds_temp = c(rep(1,200), rep(2,200), rep(3,200), rep(4,200), rep(5,200))
-# test_folds = list(`1` = which(folds_temp==1), `2` = which(folds_temp==2),
-#                   `3` = which(folds_temp==3),
-#              `4` = which(folds_temp==4), `5` = which(folds_temp==5))
+
 #Fake 1:
 fit1 <- glm(Y ~ X1 + X2, data = O, family = "binomial")
 p1 <- predict(fit1, newdata = O, type="response")
@@ -22,35 +19,39 @@ p1 <- predict(fit1, newdata = O, type="response")
 fit2 <- glm(Y ~ 1, data = O, family = "binomial")
 p2 <- predict(fit2, newdata = O, type="response")
 
+# Get cvAUC estimates and ICs
 cvAUC1 <- cvAUC_ic(predictions1 = p1, labels = O$Y, confidence = 0.95)
 cvAUC2 <- cvAUC_ic(predictions1 = p2, labels = O$Y, confidence = 0.95)
 
+# Comparison Tests
 compare_cvAUC(predictions1 = p1,
-             predictions2 = p2,
-             labels = O$Y,
-             label.ordering = NULL,
-             folds = NULL,
-             confidence = 0.95,
-             comparison = "diff")
+              predictions2 = p2,
+              labels = O$Y,
+              label.ordering = NULL,
+              folds = NULL,
+              confidence = 0.95,
+              comparison = "diff")
 
 compare_cvAUC(predictions1 = p1,
-             predictions2 = p2,
-             labels = O$Y,
-             label.ordering = NULL,
-             folds = NULL,
-             confidence = 0.95,
-             comparison = "ratio")
+              predictions2 = p2,
+              labels = O$Y,
+              label.ordering = NULL,
+              folds = NULL,
+              confidence = 0.95,
+              comparison = "ratio")
 
-compare_metric(predictions1 = p1,
-             predictions2 = p2,
-             labels = O$Y,
-             metric = "npv",
-             threshold_type = "sens",
-             threshold = 0.2)
-
-compare_metric(predictions1 = p1,
-             predictions2 = p2,
-             labels = O$Y,
-             metric = "ppv",
-             threshold_type = "prob",
-             threshold = 0.5)
+# Test Sample Metric Comparisons
+met_list = c("ppv", "npv", "sens", "spec")
+cons_list = c("sens", "spec")
+for (met in met_list){
+  for (cons in cons_list){
+    if (met != cons){
+      print(compare_metric(predictions1 = p1,
+                           predictions2 = p2,
+                           labels = O$Y,
+                           metric = met,
+                           threshold_type = cons,
+                           threshold = .5))
+    }
+  }
+}
