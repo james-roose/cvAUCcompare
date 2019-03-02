@@ -33,7 +33,7 @@ compare_metric <- function(predictions1,
                            threshold_type,
                            threshold,
                            confidence = 0.95,
-                           se_type = "binomial"){
+                           ci_type = "binomial"){
   #Check Inputs
   .check_metric_inputs(predictions1 = predictions1,
                        predictions2 = predictions2,
@@ -53,14 +53,16 @@ compare_metric <- function(predictions1,
                            metric = metric,
                            threshold_type = threshold_type,
                            threshold = threshold,
-                           confidence = confidence))
+                           confidence = confidence,
+                           ci_type = ci_type))
   m1 = metric1[1]
   metric2 = unlist(summarize_metric(predictions2,
                            labels = labels,
                            metric = metric,
                            threshold_type = threshold_type,
                            threshold = threshold,
-                           confidence = confidence))
+                           confidence = confidence,
+                           ci_type = ci_type))
   m2 = metric2[1]
 
 
@@ -94,7 +96,7 @@ summarize_metric <- function(predictions,
                              threshold_type,
                              threshold,
                              confidence = 0.95,
-                             se_type = "binomial"){
+                             ci_type = "binomial"){
 
   .check_met_summary_inputs(predictions = predictions,
                             labels = labels,
@@ -107,53 +109,47 @@ summarize_metric <- function(predictions,
 
   ### Get Metric of Interest Summary
   metric = cm[metric]
-  metric_se = get_metric_se(n = length(predictions),
-                             p = metric,
-                             se_type = se_type)
-  metric_ci = get_ci(mean = unlist(metric), se = unlist(metric_se), confidence = confidence)
+  metric_se = get_metric_se(n = length(predictions), p = metric)
+  metric_ci = get_ci(mean = unlist(metric),
+                     se = unlist(metric_se),
+                     confidence = confidence,
+                     ci_type = ci_type)
 
   summary = data.frame(c(target = metric, se = metric_se, ci_lower = metric_ci[1], ci_upper = metric_ci[2]))
   return(summary)
 }
 
-# Function to get binomial standard error estimate for proportion p, sample size n
-get_binomial_se <- function(n, p){
-  sqrt((1/n)*p*(1-p))
+
+# Function to get CI - either binomial or logit type approximation
+.get_ci <- function(mean, se, confidence, ci_type){
+  if (ci_type  == "binomial"){
+      ci = unlist( c(mean + se*qnorm((1-confidence)/2), mean - se*qnorm((1-confidence)/2)))
+  } else if (ci_type == "logit"){
+      ci = get_logit_ci(mean, se, confidence)
+  } else {stop("Invalid CI type specified; must be one of binomial, logit") }
+    return(ci)
 }
 
-#Function to get confidence interval given se, confidence level using normal approx
-get_ci <- function(mean, se, confidence) {
-  return(unlist( c(mean + se*qnorm((1-confidence)/2), mean - se*qnorm((1-confidence)/2))))
-}
-
-# Function to get se on logit scale
-get_logit_se <- function(n, p){
-  NULL
+# Function to get a logit-transform based confidence interval
+.get_logit_ci <- function(mean, se, confidence){
+  theta = log(mean/(1 - mean))
+  z = -qnorm((1-confidence)/2)
+  margin_error = z*(se/(mean*(1-mean)))
+  theta_ci = c(theta - margin_error, theta + margin_error)
+  ci = sapply(theta_ci, FUN = plogis)
+  return(ci)
 }
 
 # Function to get IC based inference for sens, spec, ppv, npv differences
-get_ic_inference <- function(n, psi1, psi2, ic1, ic2){
+.get_ic_inference <- function(n, psi1, psi2, ic1, ic2){
   #Requires derivation of influence function
   NULL
 }
 
-# Function to get a logit-transform based confidence interval for 1 estimator
-get_logit_ci <- function(p, confidence){
-  NULL
-}
-
-# Return Variance and Standard Error of a Specified Metric
-# confusion_mat is a dataframe with columns named
-# metric is the name of the column of interest
-get_metric_se <- function(n, p, se_type = "binomial"){
-  if (se_type  == "binomial"){
-    se = get_binomial_se(n, p)
-  } else if (se_type == "logit"){
-    se = get_logit_se(n, p)
-  } else {stop("Invalid inference type specified; must be one of binomial,
-               logit")
-  }
-  return(se)
+# Function to get binomial standard error estimate for proportion p, sample size n,
+# uses normal approximation
+get_metric_se <- function(n, p){
+  sqrt((1/n)*p*(1-p))
 }
 
 # Function to check inputs for metric comparison
