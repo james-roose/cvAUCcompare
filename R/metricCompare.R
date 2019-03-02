@@ -148,7 +148,7 @@ summarize_metric <- function(predictions,
 
 # Function to get binomial standard error estimate for proportion p, sample size n,
 # uses normal approximation
-get_metric_se <- function(n, p){
+.get_metric_se <- function(n, p){
   sqrt((1/n)*p*(1-p))
 }
 
