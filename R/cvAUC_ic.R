@@ -42,13 +42,15 @@ cvAUC_ic <- function(predictions1, labels, label.ordering = NULL, folds = NULL,
     n_pos <- sum(fold_labels == pos)
     n_neg <- n_rows - n_pos
     auc <- cvAUC::AUC(fold_preds, fold_labels)
-    DT <- data.table(pred = fold_preds, label = fold_labels)
+    DT <- data.table(pred = fold_preds, label = fold_labels, id = 1:length(fold_preds))
     DT <- DT[order(pred, -xtfrm(label))]  #Sort by asc(pred), desc(label)
     DT[, fracNegLabelsWithSmallerPreds := cumsum(label == neg)/n_neg]
     DT <- DT[order(-pred, label)]
     DT[, fracPosLabelsWithLargerPreds := cumsum(label == pos)/n_pos]
     DT[, icVal := ifelse(label == pos, w1 * (fracNegLabelsWithSmallerPreds - auc),
                          w0 * (fracPosLabelsWithLargerPreds - auc))]
+    # Re sort to original order
+    DT <- DT[order(id)]
     return(DT$icVal)
   }
 
