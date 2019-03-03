@@ -15,6 +15,6 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.1.0),
     ROCR,
-    data.table (>= 1.12.0),
     cvAUC
+Imports: data.table
 RoxygenNote: 6.1.1
