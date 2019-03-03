@@ -23,22 +23,24 @@ compare_cvAUC <- function(predictions1,
                           predictions2,
                           labels,
                           label.ordering,
-                          folds=NULL,
+                          folds = NULL,
                           confidence = 0.95,
                           comparison = "diff"){
   # Obtain cvAUC Estimates and Influence Curves
   cvAUC1 = cvAUC_ic(predictions1, labels, label.ordering, folds, confidence)
   cvAUC2 = cvAUC_ic(predictions2, labels, label.ordering, folds, confidence)
 
+  # Should check folds are the same somewhere
+
   # Get One of 3 Measures of Interest
   if(comparison == "diff"){
-    res = difference(cvAUC1$cvauc, cvAUC2$cvauc, ic1 = cvAUC1$ic, ic2 = cvAUC2$ic)
+    res = difference(cvAUC1$cvauc, cvAUC2$cvauc, ic1 = unlist(cvAUC1$ic), ic2 = unlist(cvAUC2$ic))
     t_stat = (res[[1]] - 0)/sqrt(res[[2]])
   } else if (comparison == "ratio"){
-    res = ratio(cvAUC1$cvauc, cvAUC2$cvauc, ic1 = cvAUC1$ic, ic2 = cvAUC2$ic)
+    res = ratio(cvAUC1$cvauc, cvAUC2$cvauc, ic1 = unlist(cvAUC1$ic), ic2 = unlist(cvAUC2$ic))
     t_stat = (res[[1]] - 1)/sqrt(res[[2]])
   } else if (comparison == "log_ratio"){
-    res = logratio(cvAUC1$cvauc, cvAUC2$cvauc, ic1 = cvAUC1$ic, ic2 = cvAUC2$ic)
+    res = logratio(cvAUC1$cvauc, cvAUC2$cvauc, ic1 = unlist(cvAUC1$ic), ic2 = unlist(cvAUC2$ic))
     t_stat = (res[[1]] - 1)/sqrt(res[[2]])
     #Note should push CIs back onto original scale too
   } else {stop("Invalid comparison specified; must be one of diff, ratio, log_ratio") }
@@ -50,7 +52,7 @@ compare_cvAUC <- function(predictions1,
   # p-value for difference
   p_val = 2*(1 - pnorm(t_stat))
 
-  return(list(comparison = comparison, h = h, var_h = res[[2]],
-              se_h = se_h, ci_l = h-z*se_h, ci_u = h+z*se_h,
-              t_stat = t_stat, p_val = p_val))
+  return(c(h = h, var_h = res[[2]], se_h = se_h,
+           ci_l = h-z*se_h, ci_u = h+z*se_h,
+           t_stat = t_stat, p_val = p_val))
 }

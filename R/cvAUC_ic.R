@@ -62,16 +62,12 @@ cvAUC_ic <- function(predictions1, labels, label.ordering = NULL, folds = NULL,
   cvauc1 <- cvAUC::cvAUC(predictions1, labels1, folds = folds1)$cvAUC
 
   #Return Inference
-  var = mean(ic1^2)
-  se = sqrt(var)
+  var = mean(unlist(lapply(ic1, FUN = function(x) mean(x^2))))
+  se = sqrt(var/n_obs1)
   z = -qnorm((1- confidence)/2)
   ci_l = cvauc1 - z*se
   ci_u = cvauc1 + z*se
 
-  list(cvauc = cvauc1,
-       var = var,
-       se = se,
-       ci_l = ci_l,
-       ci_u = ci_u,
+  list(cvauc = cvauc1, var = var, se = se, ci_l = ci_l, ci_u = ci_u,
        ic = ic1)
 }

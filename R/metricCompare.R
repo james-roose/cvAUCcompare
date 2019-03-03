@@ -109,8 +109,8 @@ summarize_metric <- function(predictions,
 
   ### Get Metric of Interest Summary
   metric = cm[metric]
-  metric_se = get_metric_se(n = length(predictions), p = metric)
-  metric_ci = get_ci(mean = unlist(metric),
+  metric_se = .get_metric_se(n = length(predictions), p = metric)
+  metric_ci = .get_ci(mean = unlist(metric),
                      se = unlist(metric_se),
                      confidence = confidence,
                      ci_type = ci_type)
@@ -125,7 +125,7 @@ summarize_metric <- function(predictions,
   if (ci_type  == "binomial"){
       ci = unlist( c(mean + se*qnorm((1-confidence)/2), mean - se*qnorm((1-confidence)/2)))
   } else if (ci_type == "logit"){
-      ci = get_logit_ci(mean, se, confidence)
+      ci = .get_logit_ci(mean, se, confidence)
   } else {stop("Invalid CI type specified; must be one of binomial, logit") }
     return(ci)
 }

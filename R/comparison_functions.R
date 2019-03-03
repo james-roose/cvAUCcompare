@@ -24,7 +24,7 @@ difference <- function(psi1, psi2, ic1, ic2){
   grad = c(1, -1)
   Sigma = cov(as.matrix(cbind(ic1, ic2)))
 
-  var_h = (1/nobs)*delta_method(grad, Sigma)
+  var_h = (1/n_obs)*.delta_method(grad, Sigma)
   return(list(h = h, var = var_h))
 }
 
@@ -48,7 +48,7 @@ ratio <- function(psi1, psi2, ic1, ic2){
   grad = c(1/psi2, -psi1/(psi2^2))
   Sigma = cov(as.matrix(cbind(ic1, ic2)))
 
-  var_h = (1/nobs)*delta_method(grad, Sigma)
+  var_h = (1/n_obs)*.delta_method(grad, Sigma)
   return(list(h = h, var_h = var_h))
 }
 
@@ -72,7 +72,7 @@ logratio <- function(psi1, psi2, ic1, ic2){
   grad = c(1/psi1, -1/psi2)
   Sigma = cov(as.matrix(cbind(ic1, ic2)))
 
-  var_h = (1/nobs)*delta_method(grad, Sigma)
+  var_h = (1/n_obs)*.delta_method(grad, Sigma)
   return(list(h = h, var_h = var_h))
 }
 
@@ -87,5 +87,5 @@ logratio <- function(psi1, psi2, ic1, ic2){
   stopifnot(is.numeric(psi1) & (psi1 < 1) & (psi1 > 0))
   stopifnot(is.numeric(psi2) & (psi2 < 1) & (psi2 > 0))
   stopifnot(is.numeric(ic1) & (is.numeric(ic2)) &
-              length(ic1 == ic2) & (ic1 != ic2))
+              length(ic1) == length(ic2))
 }
